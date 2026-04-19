@@ -1,0 +1,121 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, pdo_sqlite
+          coverage: none
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Prepare application environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Run test suite
+        run: php artisan test
+
+  deploy:
+    name: Deploy to production
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create deployment archive
+        run: |
+          tar \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='vendor' \
+            --exclude='node_modules' \
+            --exclude='tests' \
+            --exclude='.env' \
+            --exclude='storage/logs/*' \
+            --exclude='storage/framework/cache/*' \
+            --exclude='storage/framework/sessions/*' \
+            --exclude='storage/framework/views/*' \
+            -czf release.tar.gz .
+
+      - name: Upload release archive
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          source: release.tar.gz
+          target: ${{ secrets.DEPLOY_PATH }}/shared
+
+      - name: Deploy release on server
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          APP_ENV_FILE: ${{ secrets.APP_ENV_FILE }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          RELEASE_SHA: ${{ github.sha }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          envs: APP_ENV_FILE,DEPLOY_PATH,RELEASE_SHA
+          script_stop: true
+          script: |
+            set -e
+
+            RELEASE_DIR="$DEPLOY_PATH/releases/$RELEASE_SHA"
+            SHARED_DIR="$DEPLOY_PATH/shared"
+            CURRENT_DIR="$DEPLOY_PATH/current"
+
+            mkdir -p "$DEPLOY_PATH/releases"
+            mkdir -p "$SHARED_DIR/storage/app"
+            mkdir -p "$SHARED_DIR/storage/framework/cache"
+            mkdir -p "$SHARED_DIR/storage/framework/sessions"
+            mkdir -p "$SHARED_DIR/storage/framework/views"
+            mkdir -p "$SHARED_DIR/storage/logs"
+
+            printf '%s' "$APP_ENV_FILE" > "$SHARED_DIR/.env"
+
+            rm -rf "$RELEASE_DIR"
+            mkdir -p "$RELEASE_DIR"
+            tar -xzf "$SHARED_DIR/release.tar.gz" -C "$RELEASE_DIR"
+
+            rm -f "$RELEASE_DIR/.env"
+            rm -rf "$RELEASE_DIR/storage"
+            ln -sfn "$SHARED_DIR/.env" "$RELEASE_DIR/.env"
+            ln -sfn "$SHARED_DIR/storage" "$RELEASE_DIR/storage"
+
+            cd "$RELEASE_DIR"
+            composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+            php artisan migrate --force
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            ln -sfn "$RELEASE_DIR" "$CURRENT_DIR"
+            rm -f "$SHARED_DIR/release.tar.gz"
