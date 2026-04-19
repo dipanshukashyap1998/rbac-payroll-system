@@ -52,6 +52,11 @@ class User extends Authenticatable
         return $this->hasMany(Company::class, 'created_by');
     }
 
+    public function socialAccounts()
+    {
+        return $this->hasMany(SocialAccount::class);
+    }
+
     public function userRoles()
     {
         return $this->hasMany(UserRole::class);

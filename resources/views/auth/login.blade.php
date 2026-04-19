@@ -91,10 +91,8 @@
                         <span class="h-px flex-1 bg-slate-200"></span>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-1 gap-2">
                         <a class="inline-flex items-center justify-center gap-1 rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50" href="{{ route('social.login', 'google') }}">Google</a>
-                        <a class="inline-flex items-center justify-center gap-1 rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50" href="{{ route('social.login', 'facebook') }}">Facebook</a>
-                        <a class="inline-flex items-center justify-center gap-1 rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50" href="{{ route('social.login', 'twitter') }}">Twitter</a>
                     </div>
                 </div>
             </div>

@@ -21,8 +21,11 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 
     Route::get('/auth/{provider}', [SocialAuthController::class, 'redirect'])
-        ->whereIn('provider', ['google', 'facebook', 'twitter'])
+        ->whereIn('provider', ['google'])
         ->name('social.login');
+    Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'])
+        ->whereIn('provider', ['google'])
+        ->name('social.callback');
 });
 
 Route::middleware(['auth', 'admin.company'])->group(function () {
