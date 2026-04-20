@@ -1,16 +1,30 @@
 @extends('layouts.app', ['title' => 'Salary Structures'])
 
 @section('content')
-    <div class="card">
-        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h3 class="text-lg font-semibold text-slate-900">Salary Structure List</h3>
-            @if(auth()->user()->isAdmin())
-                <a class="btn btn-primary" href="{{ route('salary-structures.create') }}"><span class="material-symbols-rounded">add</span>Create Structure</a>
-            @endif
-        </div>
+    <div class="page-shell">
+        <section class="page-hero">
+            <div>
+                <span class="eyebrow"><span class="material-symbols-rounded">account_balance_wallet</span> Compensation design</span>
+                <h2>Salary structures</h2>
+                <p>Organize salary templates and keep compensation components easy to compare.</p>
+            </div>
+            <div class="hero-actions">
+                @if(auth()->user()->isAdmin())
+                    <a class="btn btn-primary" href="{{ route('salary-structures.create') }}"><span class="material-symbols-rounded">add</span>Create Structure</a>
+                @endif
+            </div>
+        </section>
 
-        <div class="overflow-x-auto rounded-xl border border-slate-200">
-            <table class="table">
+        <div class="card">
+            <div class="toolbar-card mb-4">
+                <div>
+                    <h3 class="panel-title">Structure list</h3>
+                    <p class="panel-copy">Base salary and component values are surfaced in one modern table.</p>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table class="table">
                 <thead>
                 <tr>
                     <th>Name</th>
@@ -23,10 +37,13 @@
                 <tbody>
                 @forelse($salaryStructures as $salaryStructure)
                     <tr>
-                        <td>{{ $salaryStructure->name ?? '-' }}</td>
+                        <td>
+                            <div class="font-medium text-slate-900">{{ $salaryStructure->name ?? '-' }}</div>
+                            <div class="text-sm text-slate-500">Template</div>
+                        </td>
                         <td>{{ $salaryStructure->company?->name }}</td>
-                        <td>{{ $salaryStructure->base_salary }}</td>
-                        <td>{{ $salaryStructure->hra }}</td>
+                        <td>{{ number_format($salaryStructure->base_salary, 2) }}</td>
+                        <td>{{ number_format($salaryStructure->hra, 2) }}</td>
                         <td>
                             @if(auth()->user()->isAdmin())
                                 <div class="actions">
@@ -46,9 +63,10 @@
                     <tr><td colspan="5" class="text-slate-500">No salary structures found.</td></tr>
                 @endforelse
                 </tbody>
-            </table>
-        </div>
+                </table>
+            </div>
 
-        <div class="mt-4">{{ $salaryStructures->links() }}</div>
+            <div class="mt-4">{{ $salaryStructures->links() }}</div>
+        </div>
     </div>
 @endsection

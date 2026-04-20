@@ -85,6 +85,11 @@
                         </button>
                     </form>
 
+                    <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                        New here?
+                        <a class="font-semibold text-blue-700 transition hover:text-blue-800" href="{{ route('register') }}">Create an admin account</a>
+                    </div>
+
                     <div class="my-6 flex items-center gap-3 text-xs uppercase tracking-wider text-slate-400">
                         <span class="h-px flex-1 bg-slate-200"></span>
                         Continue with
