@@ -23,18 +23,32 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
 
-    env:
-      RELEASE_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
-
     steps:
+      - name: Resolve release metadata
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_run" ]; then
+            echo "RELEASE_SHA=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_ENV"
+            echo "RELEASE_BRANCH=${{ github.event.workflow_run.head_branch }}" >> "$GITHUB_ENV"
+          else
+            echo "RELEASE_SHA=${GITHUB_SHA}" >> "$GITHUB_ENV"
+            echo "RELEASE_BRANCH=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+          fi
+
+      - name: Print release metadata
+        run: |
+          echo "Deploying SHA: ${RELEASE_SHA}"
+          echo "Deploying branch: ${RELEASE_BRANCH}"
+
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ env.RELEASE_SHA }}
 
       - name: Create deployment archive
         run: |
-          tar \
+          STAGING_DIR="$(mktemp -d)"
+
+          rsync -a \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='vendor' \
@@ -42,11 +56,13 @@ jobs:
             --exclude='tests' \
             --exclude='.env' \
             --exclude='release.tar.gz' \
-            --exclude='storage/logs/*' \
-            --exclude='storage/framework/cache/*' \
-            --exclude='storage/framework/sessions/*' \
-            --exclude='storage/framework/views/*' \
-            -czf release.tar.gz .
+            --exclude='storage/logs/' \
+            --exclude='storage/framework/cache/' \
+            --exclude='storage/framework/sessions/' \
+            --exclude='storage/framework/views/' \
+            ./ "$STAGING_DIR/"
+
+          tar -czf release.tar.gz -C "$STAGING_DIR" .
 
       - name: Upload release archive
         uses: appleboy/scp-action@v0.1.7
