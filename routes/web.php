@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DashboardController;
@@ -19,6 +20,8 @@ Route::redirect('/', '/login');
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
+    Route::get('/register', [RegisterController::class, 'create'])->name('register');
+    Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
 
     Route::get('/auth/{provider}', [SocialAuthController::class, 'redirect'])
         ->whereIn('provider', ['google'])
@@ -55,22 +58,22 @@ Route::middleware(['auth', 'admin.company'])->group(function () {
         ->name('companies.destroy');
 
     Route::get('/employees', [EmployeeController::class, 'index'])
-        ->middleware('permission:employee.view')
+        ->middleware(['role:admin', 'permission:employee.view'])
         ->name('employees.index');
     Route::get('/employees/create', [EmployeeController::class, 'create'])
-        ->middleware('permission:employee.create')
+        ->middleware(['role:admin', 'permission:employee.create'])
         ->name('employees.create');
     Route::post('/employees', [EmployeeController::class, 'store'])
-        ->middleware('permission:employee.create')
+        ->middleware(['role:admin', 'permission:employee.create'])
         ->name('employees.store');
     Route::get('/employees/{employee}/edit', [EmployeeController::class, 'edit'])
-        ->middleware('permission:employee.edit')
+        ->middleware(['role:admin', 'permission:employee.edit'])
         ->name('employees.edit');
     Route::put('/employees/{employee}', [EmployeeController::class, 'update'])
-        ->middleware('permission:employee.edit')
+        ->middleware(['role:admin', 'permission:employee.edit'])
         ->name('employees.update');
     Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])
-        ->middleware('permission:employee.delete')
+        ->middleware(['role:admin', 'permission:employee.delete'])
         ->name('employees.destroy');
 
     Route::get('/salary-structures', [SalaryController::class, 'index'])

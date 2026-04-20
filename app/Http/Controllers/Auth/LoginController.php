@@ -25,6 +25,13 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
+            $user = $request->user();
+
+            if ($user?->isAdmin() && ! $user->ownedCompany()->exists()) {
+                return redirect()->route('companies.create')
+                    ->with('status', 'Create your company first to unlock the portal.');
+            }
+
             return redirect()->intended(route('dashboard'));
         }
 

@@ -66,7 +66,7 @@ class CompanyController extends Controller
 
         Company::query()->create($data);
 
-        return redirect()->route('companies.index')->with('status', 'Company created successfully.');
+        return redirect()->route('dashboard')->with('status', 'Company created successfully. Your portal is now ready.');
     }
 
     public function edit(Request $request, Company $company): View

@@ -1,16 +1,30 @@
 @extends('layouts.app', ['title' => 'Employees'])
 
 @section('content')
-    <div class="card">
-        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h3 class="text-lg font-semibold text-slate-900">Employee List</h3>
-            @if(auth()->user()->isAdmin())
-                <a class="btn btn-primary" href="{{ route('employees.create') }}"><span class="material-symbols-rounded">person_add</span>Create Employee</a>
-            @endif
-        </div>
+    <div class="page-shell">
+        <section class="page-hero">
+            <div>
+                <span class="eyebrow"><span class="material-symbols-rounded">groups</span> Workforce</span>
+                <h2>Employees</h2>
+                <p>Manage employee assignments, their designations, and current employment status.</p>
+            </div>
+            <div class="hero-actions">
+                @if(auth()->user()->isAdmin())
+                    <a class="btn btn-primary" href="{{ route('employees.create') }}"><span class="material-symbols-rounded">person_add</span>Create Employee</a>
+                @endif
+            </div>
+        </section>
 
-        <div class="overflow-x-auto rounded-xl border border-slate-200">
-            <table class="table">
+        <div class="card">
+            <div class="toolbar-card mb-4">
+                <div>
+                    <h3 class="panel-title">Employee list</h3>
+                    <p class="panel-copy">A compact roster of assigned users inside your company scope.</p>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table class="table">
                 <thead>
                 <tr>
                     <th>User</th>
@@ -23,11 +37,14 @@
                 <tbody>
                 @forelse($employees as $employee)
                     <tr>
-                        <td>{{ $employee->user?->name }}</td>
+                        <td>
+                            <div class="font-medium text-slate-900">{{ $employee->user?->name }}</div>
+                            <div class="text-sm text-slate-500">{{ $employee->user?->email }}</div>
+                        </td>
                         <td>{{ $employee->company?->name }}</td>
                         <td>{{ $employee->designation ?? '-' }}</td>
                         <td>
-                            <span class="rounded-full px-2.5 py-1 text-xs font-medium {{ $employee->status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">{{ ucfirst($employee->status) }}</span>
+                            <span class="badge {{ $employee->status === 'active' ? 'badge-success' : 'badge-muted' }}">{{ ucfirst($employee->status) }}</span>
                         </td>
                         <td>
                             @if(auth()->user()->isAdmin())
@@ -48,9 +65,10 @@
                     <tr><td colspan="5" class="text-slate-500">No employees found.</td></tr>
                 @endforelse
                 </tbody>
-            </table>
-        </div>
+                </table>
+            </div>
 
-        <div class="mt-4">{{ $employees->links() }}</div>
+            <div class="mt-4">{{ $employees->links() }}</div>
+        </div>
     </div>
 @endsection

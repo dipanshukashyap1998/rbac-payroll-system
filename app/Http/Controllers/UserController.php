@@ -18,7 +18,10 @@ class UserController extends Controller
 
     public function index(): View
     {
-        $users = User::query()->with(['roles', 'employeeProfile.company', 'userRoles.company'])->latest()->paginate(20);
+        $users = User::query()
+            ->with(['roles', 'ownedCompany', 'employeeProfile.company', 'userRoles.company'])
+            ->latest()
+            ->paginate(20);
 
         return view('users.index', compact('users'));
     }
