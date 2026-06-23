@@ -1,30 +1,23 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# RBAC Payroll System
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
 </p>
 
-## About Laravel
+A secure, multi-tenant corporate payroll management platform featuring Role-Based Access Control (RBAC). The application automates core salary calculations, manages dynamic Indian statutory compliance structures (PF, ESI, TDS, PT), and handles complex leave workflows such as Casual, Sick, and Earned Leaves with built-in Loss of Pay (LOP) automated proration.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Key Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Dynamic Role-Based Access Control (RBAC):** Granular permissions for Super Admins, HR Managers, Finance/Payroll Operators, and Standard Employees.
+- **Indian Statutory Compliance Engine:** Auto-calculation of PF, ESI, Professional Tax (PT variations across states), and TDS.
+- **Leave & Attendance Tracking:** Dynamic accrual mechanisms, custom sandwich policy enforcement, and automatic LOP salary deductions.
+- **Modern CI/CD Deployment:** Fully automated validation and zero-downtime symlink deployment using GitHub Actions.
 
-## CI/CD
+---
 
-This repository now includes GitHub Actions workflows for validation and deployment:
-
+## 🛠️ Local Installation Guide
 - `Auto Merge Develop to Main` runs on every push to `develop`. It merges `develop` into `main` and pushes the result, which then triggers the `main` branch CI and deploy flow.
 - `CI` runs on pushes to `main`, plus all pull requests targeting `develop` or `main`. It installs PHP dependencies and runs `php artisan test`.
 - `Deploy` runs after a successful `main` branch CI run or manually from the Actions tab. It validates the release first, uploads the application to your server over SSH, runs `composer install --no-dev`, executes `php artisan migrate --force`, refreshes Laravel caches, and points the `current` symlink at the new release.
@@ -43,3 +36,17 @@ Expected server layout:
 - The workflow creates `DEPLOY_PATH/releases`, `DEPLOY_PATH/shared`, and `DEPLOY_PATH/current`.
 - `APP_ENV_FILE` is written to `DEPLOY_PATH/shared/.env`.
 - Shared writable Laravel storage lives in `DEPLOY_PATH/shared/storage`.
+=======
+### Prerequisites
+Ensure your local environment meets the standard requirements for Laravel 10/11:
+- **PHP >= 8.2** (with BCMath, Ctype, cURL, DOM, Fileinfo, Mbstring, OpenSSL, PDO, Tokenizer, and XML extensions)
+- **Composer**
+- **Node.js & NPM**
+- **MySQL >= 8.0** or PostgreSQL
+
+### Setup Steps
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/dipanshukashyap1998/rbac-payroll-system.git](https://github.com/dipanshukashyap1998/rbac-payroll-system.git)
+   cd rbac-payroll-system
