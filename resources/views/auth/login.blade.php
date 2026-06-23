@@ -44,7 +44,7 @@
                         Secure RBAC Platform
                     </span>
                     <h1 class="text-4xl font-semibold leading-tight text-white">Sign in to manage payroll, roles and permissions.</h1>
-                    <p class="mt-4 max-w-md text-slate-300">Modern access control for superadmin, admins, and employees in a single dashboard.</p>
+                    <p class="mt-4 max-w-md text-slate-300">Modern access control for Superadmin, Admins, and Employees in a single dashboard.</p>
                 </div>
 
                 <div class="rounded-3xl border border-white/10 bg-white/95 p-6 text-slate-800 shadow-2xl backdrop-blur sm:p-8">
