@@ -102,6 +102,9 @@ Route::middleware(['auth', 'admin.company'])->group(function () {
     Route::get('/payslips', [PayslipController::class, 'index'])
         ->middleware(['role:admin,employee', 'permission:payslip.view'])
         ->name('payslips.index');
+    Route::get('/payslips/{payslip}', [PayslipController::class, 'show'])
+        ->middleware(['role:admin,employee', 'permission:payslip.view'])
+        ->name('payslips.show');
 
     Route::get('/audit-logs', [AuditLogController::class, 'index'])
         ->middleware(['role:admin', 'permission:audit_log.view'])

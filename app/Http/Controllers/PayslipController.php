@@ -61,4 +61,33 @@ class PayslipController extends Controller
 
         abort(403, 'You are not allowed to view payslips.');
     }
+
+    public function show(Request $request, Payslip $payslip): View
+    {
+        $user = $request->user();
+
+        $payslip->load(['employee.user', 'payrollRun']);
+
+        if ($user->isAdmin()) {
+            $companyId = $user->ownedCompany()->value('id');
+
+            abort_unless($payslip->payrollRun?->company_id === $companyId, 403, 'You are not allowed to view this payslip.');
+
+            return view('payslips.show', [
+                'payslip' => $payslip,
+                'isEmployeeView' => false,
+            ]);
+        }
+
+        if ($user->isEmployee()) {
+            abort_unless($payslip->employee_id === $user->employeeProfile?->id, 403, 'You are not allowed to view this payslip.');
+
+            return view('payslips.show', [
+                'payslip' => $payslip,
+                'isEmployeeView' => true,
+            ]);
+        }
+
+        abort(403, 'You are not allowed to view payslips.');
+    }
 }
