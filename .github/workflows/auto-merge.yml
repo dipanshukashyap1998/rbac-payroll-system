@@ -1,0 +1,53 @@
+name: Auto Merge Develop to Main
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: auto-merge-develop-to-main
+  cancel-in-progress: true
+
+jobs:
+  sync-and-merge:
+    name: Create or update main pull request
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          ref: develop
+          fetch-depth: 0
+
+      - name: Create or update pull request and enable auto-merge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          PR_TITLE="Sync develop into main"
+          PR_BODY="Automated promotion from \`develop\` to \`main\`. This pull request is created and kept up to date by GitHub Actions, then auto-merges once CI passes."
+
+          PR_NUMBER="$(gh pr list --repo "$REPO" --base main --head develop --state open --json number --jq '.[0].number // empty')"
+
+          if [ -z "$PR_NUMBER" ]; then
+            PR_NUMBER="$(gh api "repos/$REPO/pulls" \
+              -f title="$PR_TITLE" \
+              -f head="develop" \
+              -f base="main" \
+              -f body="$PR_BODY" \
+              --jq '.number')"
+          else
+            gh pr edit "$PR_NUMBER" --repo "$REPO" --title "$PR_TITLE" --body "$PR_BODY"
+          fi
+
+          echo "Prepared pull request #$PR_NUMBER"
+          gh pr merge "$PR_NUMBER" --repo "$REPO" --auto --merge
