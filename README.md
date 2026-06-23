@@ -25,8 +25,9 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 
 This repository now includes GitHub Actions workflows for validation and deployment:
 
-- `CI` runs on pushes to `main` and `develop`, plus all pull requests. It installs PHP dependencies and runs `php artisan test`.
-- `Deploy` runs on pushes to `main` or manually from the Actions tab. It validates the release first, uploads the application to your server over SSH, runs `composer install --no-dev`, executes `php artisan migrate --force`, refreshes Laravel caches, and points the `current` symlink at the new release.
+- `Auto Merge Develop to Main` runs on every push to `develop`. It merges `develop` into `main` and pushes the result, which then triggers the `main` branch CI and deploy flow.
+- `CI` runs on pushes to `main`, plus all pull requests targeting `develop` or `main`. It installs PHP dependencies and runs `php artisan test`.
+- `Deploy` runs after a successful `main` branch CI run or manually from the Actions tab. It validates the release first, uploads the application to your server over SSH, runs `composer install --no-dev`, executes `php artisan migrate --force`, refreshes Laravel caches, and points the `current` symlink at the new release.
 
 Set these repository or environment secrets before using deployment:
 
@@ -42,4 +43,3 @@ Expected server layout:
 - The workflow creates `DEPLOY_PATH/releases`, `DEPLOY_PATH/shared`, and `DEPLOY_PATH/current`.
 - `APP_ENV_FILE` is written to `DEPLOY_PATH/shared/.env`.
 - Shared writable Laravel storage lives in `DEPLOY_PATH/shared/storage`.
-
