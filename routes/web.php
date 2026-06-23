@@ -6,6 +6,8 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\PayslipController;
@@ -98,6 +100,41 @@ Route::middleware(['auth', 'admin.company'])->group(function () {
     Route::get('/payrolls', [PayrollController::class, 'index'])
         ->middleware(['role:admin', 'permission:payroll.view'])
         ->name('payrolls.index');
+
+    Route::get('/leave-types', [LeaveTypeController::class, 'index'])
+        ->middleware(['role:admin', 'permission:leave_type.view'])
+        ->name('leave-types.index');
+    Route::get('/leave-types/create', [LeaveTypeController::class, 'create'])
+        ->middleware(['role:admin', 'permission:leave_type.create'])
+        ->name('leave-types.create');
+    Route::post('/leave-types', [LeaveTypeController::class, 'store'])
+        ->middleware(['role:admin', 'permission:leave_type.create'])
+        ->name('leave-types.store');
+    Route::get('/leave-types/{leaveType}/edit', [LeaveTypeController::class, 'edit'])
+        ->middleware(['role:admin', 'permission:leave_type.edit'])
+        ->name('leave-types.edit');
+    Route::put('/leave-types/{leaveType}', [LeaveTypeController::class, 'update'])
+        ->middleware(['role:admin', 'permission:leave_type.edit'])
+        ->name('leave-types.update');
+    Route::delete('/leave-types/{leaveType}', [LeaveTypeController::class, 'destroy'])
+        ->middleware(['role:admin', 'permission:leave_type.delete'])
+        ->name('leave-types.destroy');
+
+    Route::get('/leave-requests', [LeaveRequestController::class, 'index'])
+        ->middleware(['role:admin,employee', 'permission:leave.view'])
+        ->name('leave-requests.index');
+    Route::get('/leave-requests/create', [LeaveRequestController::class, 'create'])
+        ->middleware(['role:employee', 'permission:leave.create'])
+        ->name('leave-requests.create');
+    Route::post('/leave-requests', [LeaveRequestController::class, 'store'])
+        ->middleware(['role:employee', 'permission:leave.create'])
+        ->name('leave-requests.store');
+    Route::patch('/leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve'])
+        ->middleware(['role:admin', 'permission:leave.approve'])
+        ->name('leave-requests.approve');
+    Route::patch('/leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject'])
+        ->middleware(['role:admin', 'permission:leave.approve'])
+        ->name('leave-requests.reject');
 
     Route::get('/payslips', [PayslipController::class, 'index'])
         ->middleware(['role:admin,employee', 'permission:payslip.view'])

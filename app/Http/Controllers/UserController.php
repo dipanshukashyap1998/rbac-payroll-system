@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Services\LeavePolicyService;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -15,6 +16,10 @@ use Illuminate\View\View;
 class UserController extends Controller
 {
     private const ALLOWED_ROLES = ['super_admin', 'admin', 'employee'];
+
+    public function __construct(private LeavePolicyService $leavePolicyService)
+    {
+    }
 
     public function index(): View
     {
@@ -179,6 +184,10 @@ class UserController extends Controller
                 'status' => 'active',
             ]
         );
+
+        if ($user->employeeProfile) {
+            $this->leavePolicyService->ensureEmployeeBalances($user->employeeProfile);
+        }
     }
 
     private function superAdminCount(): int

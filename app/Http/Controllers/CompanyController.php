@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Services\LeavePolicyService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CompanyController extends Controller
 {
+    public function __construct(private LeavePolicyService $leavePolicyService)
+    {
+    }
+
     public function index(Request $request): View
     {
         $user = $request->user();
@@ -64,7 +69,8 @@ class CompanyController extends Controller
 
         $data['created_by'] = $user->id;
 
-        Company::query()->create($data);
+        $company = Company::query()->create($data);
+        $this->leavePolicyService->seedCompanyLeaveTypes($company);
 
         return redirect()->route('dashboard')->with('status', 'Company created successfully. Your portal is now ready.');
     }

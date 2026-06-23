@@ -18,9 +18,12 @@ class Payslip extends Model
         'income_tax',
         'professional_tax',
         'pf_deduction',
+        'leave_deduction_days',
+        'leave_deduction',
         'deductions',
         'total_deductions',
         'net_salary',
+        'leave_breakdown',
         'tax_breakdown',
         'generated_at',
     ];
@@ -36,9 +39,12 @@ class Payslip extends Model
         'income_tax' => 'decimal:2',
         'professional_tax' => 'decimal:2',
         'pf_deduction' => 'decimal:2',
+        'leave_deduction_days' => 'decimal:2',
+        'leave_deduction' => 'decimal:2',
         'deductions' => 'decimal:2',
         'total_deductions' => 'decimal:2',
         'net_salary' => 'decimal:2',
+        'leave_breakdown' => 'array',
         'tax_breakdown' => 'array',
     ];
 

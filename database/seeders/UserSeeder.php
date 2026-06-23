@@ -10,6 +10,7 @@ use App\Models\Payslip;
 use App\Models\Role;
 use App\Models\SalaryStructure;
 use App\Models\User;
+use App\Services\LeavePolicyService;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
@@ -19,6 +20,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        $leavePolicyService = app(LeavePolicyService::class);
         $superAdmin = Role::query()->where('name', 'super_admin')->firstOrFail();
         $admin = Role::query()->where('name', 'admin')->firstOrFail();
         $employeeRole = Role::query()->where('name', 'employee')->firstOrFail();
@@ -59,6 +61,7 @@ class UserSeeder extends Seeder
                 'created_by' => $adminUser->id,
             ]
         );
+        $leavePolicyService->seedCompanyLeaveTypes($company);
 
         $employeeUser = User::query()->firstOrCreate(
             ['email' => 'employee@example.com'],
@@ -96,6 +99,7 @@ class UserSeeder extends Seeder
             ['employee_id' => $employee->id, 'salary_structure_id' => $salaryStructure->id],
             ['effective_from' => now()->startOfMonth()->toDateString()]
         );
+        $leavePolicyService->ensureEmployeeBalances($employee);
 
         $payrollCurrent = Payroll::query()->firstOrCreate(
             ['company_id' => $company->id, 'month' => now()->month, 'year' => now()->year],

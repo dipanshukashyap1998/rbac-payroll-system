@@ -29,7 +29,12 @@ class TaxCalculationService
      */
     public function calculateSalaryComponents(Employee $employee, $baseSalary)
     {
-        $salaryStructure = $employee->salary()?->salaryStructure;
+        $salaryAssignment = $employee->salaries()
+            ->with('salaryStructure')
+            ->latest('effective_from')
+            ->first();
+
+        $salaryStructure = $salaryAssignment?->salaryStructure;
 
         if (!$salaryStructure) {
             return [
@@ -47,7 +52,11 @@ class TaxCalculationService
             ->where('is_active', true)
             ->get();
 
-        $earnings = ['base' => $baseSalary];
+        $earnings = [
+            'base' => $baseSalary,
+            'hra' => (float) ($salaryStructure->hra ?? 0),
+            'allowances' => (float) ($salaryStructure->allowances ?? 0),
+        ];
 
         foreach ($components as $component) {
             $amount = $this->getComponentAmount($component, $baseSalary);
@@ -139,17 +148,46 @@ class TaxCalculationService
     }
 
     /**
+     * Calculate ESIC deduction for eligible wages.
+     */
+    public function calculateEsicDeduction($wageBase, $employeeRate = 0.75, $employerRate = 3.25, $wageCeiling = 21000): array
+    {
+        $wageBase = max(0, (float) $wageBase);
+        $isApplicable = $wageBase > 0 && $wageBase <= $wageCeiling;
+
+        $employeeShare = $isApplicable ? round(($wageBase * $employeeRate) / 100, 2) : 0;
+        $employerShare = $isApplicable ? round(($wageBase * $employerRate) / 100, 2) : 0;
+
+        return [
+            'applicable' => $isApplicable,
+            'wage_base' => round($wageBase, 2),
+            'employee_rate' => $employeeRate,
+            'employer_rate' => $employerRate,
+            'employee_share' => $employeeShare,
+            'employer_share' => $employerShare,
+            'wage_ceiling' => $wageCeiling,
+        ];
+    }
+
+    /**
      * Calculate total deductions
      */
-    public function calculateTotalDeductions(Employee $employee, $grossSalary, $baseSalary, $annualGrossSalary, $state = 'General', $pfWageBase = null)
+    public function calculateTotalDeductions(Employee $employee, $grossSalary, $baseSalary, $annualGrossSalary, $state = 'General', $pfWageBase = null, $esicWageBase = null)
     {
         $incomeTaxBreakdown = $this->calculateIncomeTaxBreakdown($annualGrossSalary, 50000); // Standard deduction
         $incomeTax = $incomeTaxBreakdown['tax'];
         $professionalTax = $this->calculateProfessionalTax($annualGrossSalary, $state);
         $pfDeduction = $this->calculatePFDeduction($pfWageBase ?? $baseSalary);
+        $esicBreakdown = $this->calculateEsicDeduction($esicWageBase ?? $grossSalary);
+        $esicDeduction = $esicBreakdown['employee_share'];
 
         // Get other deductions from salary components
-        $salaryStructure = $employee->salary()?->salaryStructure;
+        $salaryAssignment = $employee->salaries()
+            ->with('salaryStructure')
+            ->latest('effective_from')
+            ->first();
+
+        $salaryStructure = $salaryAssignment?->salaryStructure;
         $otherDeductions = 0;
 
         if ($salaryStructure) {
@@ -177,8 +215,15 @@ class TaxCalculationService
             'pf_deduction' => $pfDeduction,
             'pf_rate' => 12,
             'pf_wage_base' => round($pfWageBase ?? $baseSalary, 2),
+            'esic_deduction' => $esicDeduction,
+            'annual_esic_deduction' => round($esicDeduction * 12, 2),
+            'esic_rate' => $esicBreakdown['employee_rate'],
+            'esic_wage_base' => $esicBreakdown['wage_base'],
+            'esic_applicable' => $esicBreakdown['applicable'],
+            'esic_wage_ceiling' => $esicBreakdown['wage_ceiling'],
+            'employer_esic_share' => $esicBreakdown['employer_share'],
             'other_deductions' => $otherDeductions,
-            'total' => $monthlyIncomeTax + $monthlyProfessionalTax + $pfDeduction + $otherDeductions,
+            'total' => $monthlyIncomeTax + $monthlyProfessionalTax + $pfDeduction + $esicDeduction + $otherDeductions,
         ];
     }
 
@@ -205,9 +250,9 @@ class TaxCalculationService
     /**
      * Get tax breakdown details
      */
-    public function getTaxBreakdown($employee, $grossSalary, $baseSalary, $annualGrossSalary, $state = 'General', $pfWageBase = null)
+    public function getTaxBreakdown($employee, $grossSalary, $baseSalary, $annualGrossSalary, $state = 'General', $pfWageBase = null, $esicWageBase = null)
     {
-        $deductions = $this->calculateTotalDeductions($employee, $grossSalary, $baseSalary, $annualGrossSalary, $state, $pfWageBase);
+        $deductions = $this->calculateTotalDeductions($employee, $grossSalary, $baseSalary, $annualGrossSalary, $state, $pfWageBase, $esicWageBase);
 
         return [
             'taxable_income' => $deductions['taxable_income'],
@@ -221,6 +266,13 @@ class TaxCalculationService
             'annual_pf' => round($deductions['pf_deduction'] * 12, 2),
             'pf_rate' => $deductions['pf_rate'],
             'pf_wage_base' => $deductions['pf_wage_base'],
+            'monthly_esic' => $deductions['esic_deduction'],
+            'annual_esic' => $deductions['annual_esic_deduction'],
+            'esic_rate' => $deductions['esic_rate'],
+            'esic_wage_base' => $deductions['esic_wage_base'],
+            'esic_applicable' => $deductions['esic_applicable'],
+            'esic_wage_ceiling' => $deductions['esic_wage_ceiling'],
+            'employer_esic_share' => $deductions['employer_esic_share'],
             'other_deductions' => $deductions['other_deductions'],
             'total_monthly_deductions' => $deductions['total'],
             'gross_salary' => $grossSalary,

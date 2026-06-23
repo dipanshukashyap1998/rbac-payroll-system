@@ -55,6 +55,7 @@ class DashboardController extends Controller
                 ['label' => 'Company Profile', 'route' => route('companies.index'), 'icon' => 'apartment', 'description' => 'Manage the company profile and operational status.'],
                 ['label' => 'Employees', 'route' => route('employees.index'), 'icon' => 'badge', 'description' => 'Maintain employee records and staffing data.'],
                 ['label' => 'Salary Structures', 'route' => route('salary-structures.index'), 'icon' => 'account_balance_wallet', 'description' => 'Define compensation templates and policies.'],
+                ['label' => 'Leaves', 'route' => route('leave-requests.index'), 'icon' => 'event_note', 'description' => 'Configure leave policies and review employee requests.'],
                 ['label' => 'Payrolls', 'route' => route('payrolls.index'), 'icon' => 'receipt_long', 'description' => 'Review payroll cycles and run status.'],
                 ['label' => 'Payslips', 'route' => route('payslips.index'), 'icon' => 'description', 'description' => 'Track published employee pay statements.'],
                 ['label' => 'Audit Logs', 'route' => route('audit-logs.index'), 'icon' => 'history', 'description' => 'Follow sensitive actions in one timeline.'],
@@ -72,6 +73,7 @@ class DashboardController extends Controller
             $modules = [
                 ['label' => 'My Salary Structure', 'route' => route('salary-structures.index'), 'icon' => 'account_balance_wallet', 'description' => 'See your assigned compensation structure.'],
                 ['label' => 'My Payslips', 'route' => route('payslips.index'), 'icon' => 'description', 'description' => 'Access your latest released payslips.'],
+                ['label' => 'Leaves', 'route' => route('leave-requests.index'), 'icon' => 'event_note', 'description' => 'Track balances and submit leave applications.'],
             ];
 
             $dashboardStats = [

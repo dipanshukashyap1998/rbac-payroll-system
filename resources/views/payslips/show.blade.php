@@ -2,7 +2,6 @@
 
 @section('content')
     @php
-        $breakdown = $payslip->tax_breakdown ?? [];
         $incomeTaxSlabs = $breakdown['income_tax_slabs'] ?? [];
     @endphp
 
@@ -11,7 +10,7 @@
             <div>
                 <span class="eyebrow"><span class="material-symbols-rounded">receipt_long</span> Payslip breakdown</span>
                 <h2>{{ $payslip->employee?->user?->name ?? 'Employee' }}</h2>
-                <p>Detailed salary, tax slab, and PF deduction breakdown for the selected pay run.</p>
+                <p>Full payslip details with earnings, statutory deductions, and in-hand salary.</p>
             </div>
             <div class="flex flex-wrap gap-3">
                 <a href="{{ route('payslips.index') }}" class="btn btn-secondary">Back to payslips</a>
@@ -20,22 +19,24 @@
 
         <div class="grid gap-6 lg:grid-cols-3">
             <div class="card lg:col-span-2">
-                <h3 class="panel-title">Salary summary</h3>
-                <div class="table-wrap mt-4">
-                    <table class="table">
-                        <tbody>
-                        <tr><th>Payroll month</th><td>{{ str_pad($payslip->payrollRun?->month ?? 0, 2, '0', STR_PAD_LEFT) }} / {{ $payslip->payrollRun?->year ?? '-' }}</td></tr>
-                        <tr><th>Gross salary</th><td>{{ number_format($payslip->gross_salary ?? 0, 2) }}</td></tr>
-                        <tr><th>Standard deduction</th><td>{{ number_format($breakdown['standard_deduction'] ?? 0, 2) }}</td></tr>
-                        <tr><th>Taxable income</th><td>{{ number_format($breakdown['taxable_income'] ?? 0, 2) }}</td></tr>
-                        <tr><th>Income tax (monthly)</th><td>{{ number_format($payslip->income_tax ?? 0, 2) }}</td></tr>
-                        <tr><th>Professional tax (monthly)</th><td>{{ number_format($payslip->professional_tax ?? 0, 2) }}</td></tr>
-                        <tr><th>PF deduction</th><td>{{ number_format($payslip->pf_deduction ?? 0, 2) }} at {{ $breakdown['pf_rate'] ?? 12 }}% of {{ number_format($breakdown['pf_wage_base'] ?? 0, 2) }}</td></tr>
-                        <tr><th>Other deductions</th><td>{{ number_format($payslip->deductions ?? 0, 2) }}</td></tr>
-                        <tr><th>Total deductions</th><td>{{ number_format($payslip->total_deductions ?? 0, 2) }}</td></tr>
-                        <tr><th>Net salary</th><td><strong>{{ number_format($payslip->net_salary ?? 0, 2) }}</strong></td></tr>
-                        </tbody>
-                    </table>
+                <h3 class="panel-title">Pay summary</h3>
+                <div class="grid gap-4 sm:grid-cols-3 mt-4">
+                    <div class="rounded-2xl bg-slate-50 p-4">
+                        <div class="text-xs uppercase tracking-wide text-slate-500">Gross salary</div>
+                        <div class="mt-1 text-2xl font-semibold text-slate-900">{{ number_format($breakdown['gross_salary'] ?? 0, 2) }}</div>
+                    </div>
+                    <div class="rounded-2xl bg-slate-50 p-4">
+                        <div class="text-xs uppercase tracking-wide text-slate-500">Total deductions</div>
+                        <div class="mt-1 text-2xl font-semibold text-slate-900">{{ number_format($breakdown['total_deductions'] ?? 0, 2) }}</div>
+                    </div>
+                    <div class="rounded-2xl bg-emerald-50 p-4">
+                        <div class="text-xs uppercase tracking-wide text-emerald-700">In-hand salary</div>
+                        <div class="mt-1 text-2xl font-semibold text-emerald-900">{{ number_format($breakdown['net_salary'] ?? 0, 2) }}</div>
+                    </div>
+                </div>
+
+                <div class="mt-4 rounded-2xl border border-slate-200/70 bg-white/60 p-4 text-sm text-slate-600">
+                    This is the monthly take-home amount after all shown deductions. Annual in-hand is {{ number_format($breakdown['annual_net_salary'] ?? 0, 2) }}.
                 </div>
             </div>
 
@@ -43,24 +44,124 @@
                 <h3 class="panel-title">Quick figures</h3>
                 <div class="mt-4 space-y-4">
                     <div class="rounded-2xl bg-slate-50 p-4">
-                        <div class="text-xs uppercase tracking-wide text-slate-500">Annual income tax</div>
-                        <div class="mt-1 text-2xl font-semibold text-slate-900">{{ number_format($breakdown['annual_income_tax'] ?? 0, 2) }}</div>
+                        <div class="text-xs uppercase tracking-wide text-slate-500">Payroll month</div>
+                        <div class="mt-1 text-2xl font-semibold text-slate-900">{{ str_pad($payslip->payrollRun?->month ?? 0, 2, '0', STR_PAD_LEFT) }} / {{ $payslip->payrollRun?->year ?? '-' }}</div>
                     </div>
                     <div class="rounded-2xl bg-slate-50 p-4">
-                        <div class="text-xs uppercase tracking-wide text-slate-500">Annual PF</div>
-                        <div class="mt-1 text-2xl font-semibold text-slate-900">{{ number_format($breakdown['annual_pf'] ?? 0, 2) }}</div>
+                        <div class="text-xs uppercase tracking-wide text-slate-500">Take-home ratio</div>
+                        <div class="mt-1 text-2xl font-semibold text-slate-900">{{ number_format($breakdown['take_home_percent'] ?? 0, 2) }}%</div>
                     </div>
                     <div class="rounded-2xl bg-slate-50 p-4">
-                        <div class="text-xs uppercase tracking-wide text-slate-500">Annual professional tax</div>
-                        <div class="mt-1 text-2xl font-semibold text-slate-900">{{ number_format($breakdown['annual_professional_tax'] ?? 0, 2) }}</div>
+                        <div class="text-xs uppercase tracking-wide text-slate-500">Annual gross</div>
+                        <div class="mt-1 text-2xl font-semibold text-slate-900">{{ number_format($breakdown['annual_gross_salary'] ?? 0, 2) }}</div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <div class="grid gap-6 lg:grid-cols-2 mt-6">
+            <div class="card">
+                <h3 class="panel-title">Earnings</h3>
+                <p class="panel-copy">All visible salary components before deductions.</p>
+
+                <div class="table-wrap mt-4">
+                    <table class="table">
+                        <tbody>
+                        <tr><th>Basic salary</th><td>{{ number_format($breakdown['base_salary'] ?? 0, 2) }}</td></tr>
+                        <tr><th>HRA</th><td>{{ number_format($breakdown['hra'] ?? 0, 2) }}</td></tr>
+                        <tr><th>Allowances</th><td>{{ number_format($breakdown['allowances'] ?? 0, 2) }}</td></tr>
+                        <tr><th>DA</th><td>{{ number_format($breakdown['da'] ?? 0, 2) }}</td></tr>
+                        <tr><th>TA</th><td>{{ number_format($breakdown['ta'] ?? 0, 2) }}</td></tr>
+                        <tr><th>Gross salary</th><td><strong>{{ number_format($breakdown['gross_salary'] ?? 0, 2) }}</strong></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="panel-title">Deductions</h3>
+                <p class="panel-copy">Statutory and configured deductions that reduce your take-home pay.</p>
+
+                <div class="table-wrap mt-4">
+                    <table class="table">
+                        <tbody>
+                        <tr><th>Income tax</th><td>{{ number_format($breakdown['income_tax_monthly'] ?? 0, 2) }}</td></tr>
+                        <tr><th>Professional tax</th><td>{{ number_format($breakdown['professional_tax_monthly'] ?? 0, 2) }}</td></tr>
+                        <tr><th>PF deduction</th><td>{{ number_format($breakdown['pf_deduction'] ?? 0, 2) }} at {{ $breakdown['pf_rate'] ?? 12 }}% of {{ number_format($breakdown['pf_wage_base'] ?? 0, 2) }}</td></tr>
+                        <tr>
+                            <th>Leave deduction</th>
+                            <td>
+                                {{ number_format($breakdown['leave_deduction'] ?? 0, 2) }}
+                                @if(($breakdown['leave_deduction_days'] ?? 0) > 0)
+                                    <span class="text-slate-500">for {{ number_format($breakdown['leave_deduction_days'] ?? 0, 2) }} day(s) at {{ number_format(($breakdown['leave_breakdown']['daily_rate'] ?? 0), 2) }} per day</span>
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>ESIC deduction</th>
+                            <td>
+                                {{ number_format($breakdown['monthly_esic'] ?? 0, 2) }}
+                                @if(!empty($breakdown['esic_applicable']))
+                                    <span class="text-slate-500">at {{ $breakdown['esic_rate'] ?? 0 }}% of {{ number_format($breakdown['esic_wage_base'] ?? 0, 2) }}</span>
+                                @else
+                                    <span class="text-slate-500">not applicable above the ESIC wage ceiling</span>
+                                @endif
+                            </td>
+                        </tr>
+                        <tr><th>Other deductions</th><td>{{ number_format($breakdown['other_deductions'] ?? 0, 2) }}</td></tr>
+                        <tr><th>Total deductions</th><td><strong>{{ number_format($breakdown['total_deductions'] ?? 0, 2) }}</strong></td></tr>
+                        <tr><th>In-hand salary</th><td><strong>{{ number_format($breakdown['net_salary'] ?? 0, 2) }}</strong></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        @if(!empty($breakdown['leave_breakdown']['unpaid_leave_details']) || !empty($breakdown['leave_breakdown']['extra_paid_leave_details']))
+            <div class="card mt-6">
+                <h3 class="panel-title">Leave deduction details</h3>
+                <p class="panel-copy">These leave entries were charged because they were unpaid or exceeded the company leave balance.</p>
+
+                <div class="table-wrap mt-4">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Days</th>
+                            <th>Reason</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach(($breakdown['leave_breakdown']['unpaid_leave_details'] ?? []) as $item)
+                            <tr>
+                                <td>{{ $item['leave_type'] }}</td>
+                                <td>{{ number_format($item['days'] ?? 0, 2) }}</td>
+                                <td>Unpaid leave</td>
+                            </tr>
+                        @endforeach
+                        @foreach(($breakdown['leave_breakdown']['extra_paid_leave_details'] ?? []) as $item)
+                            <tr>
+                                <td>{{ $item['leave_type'] }}</td>
+                                <td>{{ number_format($item['days'] ?? 0, 2) }}</td>
+                                <td>Exceeded company leave balance</td>
+                            </tr>
+                        @endforeach
+                        @foreach(($breakdown['leave_breakdown']['unauthorized_leave_details'] ?? []) as $item)
+                            <tr>
+                                <td>{{ $item['leave_type'] }}</td>
+                                <td>{{ number_format($item['days'] ?? 0, 2) }}</td>
+                                <td>{{ ucfirst($item['status'] ?? 'pending') }} without approval</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
+
         <div class="card mt-6">
-            <h3 class="panel-title">Income tax slab calculation</h3>
-            <p class="panel-copy">The system applies the active slab rates to the taxable annual income after standard deduction.</p>
+            <h3 class="panel-title">Tax slab breakdown</h3>
+            <p class="panel-copy">Annual income tax is calculated on taxable income after the standard deduction.</p>
 
             <div class="table-wrap mt-4">
                 <table class="table">

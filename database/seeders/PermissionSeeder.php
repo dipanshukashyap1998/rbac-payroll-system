@@ -31,6 +31,16 @@ class PermissionSeeder extends Seeder
             'salary_structure.edit',
             'salary_structure.delete',
 
+            'leave_type.view',
+            'leave_type.create',
+            'leave_type.edit',
+            'leave_type.delete',
+            'leave.calendar.view',
+            'leave.balance.view',
+            'leave.view',
+            'leave.create',
+            'leave.approve',
+
             'payroll.view',
             'payslip.view',
             'audit_log.view',
@@ -91,6 +101,15 @@ class PermissionSeeder extends Seeder
                 'salary_structure.create',
                 'salary_structure.edit',
                 'salary_structure.delete',
+                'leave_type.view',
+                'leave_type.create',
+                'leave_type.edit',
+                'leave_type.delete',
+                'leave.calendar.view',
+                'leave.balance.view',
+                'leave.view',
+                'leave.create',
+                'leave.approve',
                 'payroll.view',
                 'payslip.view',
                 'audit_log.view',
@@ -100,8 +119,12 @@ class PermissionSeeder extends Seeder
         $employeeRole->permissions()->sync(
             Permission::query()->whereIn('name', [
                 'dashboard.view',
+                'leave.calendar.view',
+                'leave.balance.view',
                 'salary_structure.view',
                 'payslip.view',
+                'leave.view',
+                'leave.create',
             ])->pluck('id')
         );
     }

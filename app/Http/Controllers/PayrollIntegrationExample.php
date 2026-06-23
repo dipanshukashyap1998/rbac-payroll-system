@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Payroll;
 use App\Models\Employee;
+use App\Services\LeavePolicyService;
 use App\Services\TaxCalculationService;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class PayrollController extends Controller
 {
     private $taxService;
 
-    public function __construct(TaxCalculationService $taxService)
+    public function __construct(TaxCalculationService $taxService, private LeavePolicyService $leavePolicyService)
     {
         $this->taxService = $taxService;
     }
@@ -22,7 +23,10 @@ class PayrollController extends Controller
     public function generatePayslip(Payroll $payroll, Employee $employee)
     {
         // Get employee salary structure
-        $employeeSalary = $employee->salary()->with('salaryStructure')->latest()->first();
+        $employeeSalary = $employee->salaries()
+            ->with('salaryStructure')
+            ->latest('effective_from')
+            ->first();
 
         if (!$employeeSalary) {
             return redirect()->back()->with('error', 'Employee salary structure not configured');
@@ -47,11 +51,15 @@ class PayrollController extends Controller
             $baseSalary,
             $annualGrossSalary,
             $state,
-            $baseSalary + ($components['da'] ?? 0)
+            $baseSalary + ($components['da'] ?? 0),
+            $grossSalary - ($components['hra'] ?? 0)
         );
 
+        $leaveDeduction = $this->leavePolicyService->calculateLeaveDeduction($employee, $payroll, $grossSalary);
+
         // Calculate net salary
-        $netSalary = $this->taxService->calculateNetSalary($grossSalary, $deductions['total']);
+        $totalDeductions = round($deductions['total'] + $leaveDeduction['leave_deduction_amount'], 2);
+        $netSalary = $this->taxService->calculateNetSalary($grossSalary, $totalDeductions);
 
         // Get tax breakdown
         $taxBreakdown = $this->taxService->getTaxBreakdown(
@@ -60,7 +68,8 @@ class PayrollController extends Controller
             $baseSalary,
             $annualGrossSalary,
             $state,
-            $baseSalary + ($components['da'] ?? 0)
+            $baseSalary + ($components['da'] ?? 0),
+            $grossSalary - ($components['hra'] ?? 0)
         );
 
         // Create or update payslip
@@ -77,7 +86,10 @@ class PayrollController extends Controller
                 'professional_tax' => $deductions['professional_tax'],
                 'pf_deduction' => $deductions['pf_deduction'],
                 'deductions' => $deductions['other_deductions'],
-                'total_deductions' => $deductions['total'],
+                'leave_deduction_days' => $leaveDeduction['leave_deduction_days'],
+                'leave_deduction' => $leaveDeduction['leave_deduction_amount'],
+                'leave_breakdown' => $leaveDeduction,
+                'total_deductions' => $totalDeductions,
                 'net_salary' => $netSalary,
                 'tax_breakdown' => $taxBreakdown,
                 'generated_at' => now(),

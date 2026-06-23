@@ -33,4 +33,9 @@ class SalaryStructure extends Model
     {
         return $this->hasMany(EmployeeSalary::class);
     }
+
+    public function components()
+    {
+        return $this->hasMany(SalaryComponent::class);
+    }
 }

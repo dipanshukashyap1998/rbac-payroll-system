@@ -43,4 +43,14 @@ class Employee extends Model
     {
         return $this->hasMany(Payslip::class);
     }
+
+    public function leaveBalances()
+    {
+        return $this->hasMany(LeaveBalance::class);
+    }
+
+    public function leaveRequests()
+    {
+        return $this->hasMany(LeaveRequest::class);
+    }
 }

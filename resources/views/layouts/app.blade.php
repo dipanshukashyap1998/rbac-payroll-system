@@ -523,6 +523,18 @@
                 </a>
             @endif
 
+            @if($currentUser?->hasPermission('leave.view') || $currentUser?->hasPermission('leave_type.view'))
+                <a class="{{ request()->routeIs('leave-*') ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-300 hover:bg-white/10 hover:text-white' }} flex items-center gap-2 rounded-2xl px-3 py-2.5" href="{{ route('leave-requests.index') }}">
+                    <span class="material-symbols-rounded">event_note</span> Leaves
+                </a>
+            @endif
+
+            @if($currentUser?->hasPermission('leave_type.view'))
+                <a class="{{ request()->routeIs('leave-types.*') ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-300 hover:bg-white/10 hover:text-white' }} flex items-center gap-2 rounded-2xl px-3 py-2.5" href="{{ route('leave-types.index') }}">
+                    <span class="material-symbols-rounded">event_available</span> Leave Types
+                </a>
+            @endif
+
             @if($currentUser?->hasPermission('payroll.view'))
                 <a class="{{ request()->routeIs('payrolls.*') ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-300 hover:bg-white/10 hover:text-white' }} flex items-center gap-2 rounded-2xl px-3 py-2.5" href="{{ route('payrolls.index') }}">
                     <span class="material-symbols-rounded">receipt_long</span> Payrolls
