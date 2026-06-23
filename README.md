@@ -18,7 +18,25 @@ A secure, multi-tenant corporate payroll management platform featuring Role-Base
 ---
 
 ## 🛠️ Local Installation Guide
+- `Auto Merge Develop to Main` runs on every push to `develop`. It merges `develop` into `main` and pushes the result, which then triggers the `main` branch CI and deploy flow.
+- `CI` runs on pushes to `main`, plus all pull requests targeting `develop` or `main`. It installs PHP dependencies and runs `php artisan test`.
+- `Deploy` runs after a successful `main` branch CI run or manually from the Actions tab. It validates the release first, uploads the application to your server over SSH, runs `composer install --no-dev`, executes `php artisan migrate --force`, refreshes Laravel caches, and points the `current` symlink at the new release.
 
+Set these repository or environment secrets before using deployment:
+
+- `SSH_HOST`
+- `SSH_PORT`
+- `SSH_USER`
+- `SSH_PRIVATE_KEY`
+- `DEPLOY_PATH`
+- `APP_ENV_FILE`
+
+Expected server layout:
+
+- The workflow creates `DEPLOY_PATH/releases`, `DEPLOY_PATH/shared`, and `DEPLOY_PATH/current`.
+- `APP_ENV_FILE` is written to `DEPLOY_PATH/shared/.env`.
+- Shared writable Laravel storage lives in `DEPLOY_PATH/shared/storage`.
+=======
 ### Prerequisites
 Ensure your local environment meets the standard requirements for Laravel 10/11:
 - **PHP >= 8.2** (with BCMath, Ctype, cURL, DOM, Fileinfo, Mbstring, OpenSSL, PDO, Tokenizer, and XML extensions)
