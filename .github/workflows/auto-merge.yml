@@ -8,15 +8,14 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 concurrency:
   group: auto-merge-develop-to-main
   cancel-in-progress: true
 
 jobs:
-  sync-and-merge:
-    name: Create or update main pull request
+  merge-and-push:
+    name: Merge develop into main
     runs-on: ubuntu-latest
 
     steps:
@@ -26,28 +25,20 @@ jobs:
           ref: develop
           fetch-depth: 0
 
-      - name: Create or update pull request and enable auto-merge
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
+      - name: Merge develop into main and push
         run: |
           set -euo pipefail
 
-          PR_TITLE="Sync develop into main"
-          PR_BODY="Automated promotion from \`develop\` to \`main\`. This pull request is created and kept up to date by GitHub Actions, then auto-merges once CI passes."
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          PR_NUMBER="$(gh pr list --repo "$REPO" --base main --head develop --state open --json number --jq '.[0].number // empty')"
+          git fetch origin main develop
 
-          if [ -z "$PR_NUMBER" ]; then
-            PR_NUMBER="$(gh api "repos/$REPO/pulls" \
-              -f title="$PR_TITLE" \
-              -f head="develop" \
-              -f base="main" \
-              -f body="$PR_BODY" \
-              --jq '.number')"
-          else
-            gh pr edit "$PR_NUMBER" --repo "$REPO" --title "$PR_TITLE" --body "$PR_BODY"
+          if git diff --quiet origin/main..origin/develop; then
+            echo "No changes to promote from develop to main."
+            exit 0
           fi
 
-          echo "Prepared pull request #$PR_NUMBER"
-          gh pr merge "$PR_NUMBER" --repo "$REPO" --auto --merge
+          git checkout -B main origin/main
+          git merge --no-ff --no-edit origin/develop
+          git push origin HEAD:main
