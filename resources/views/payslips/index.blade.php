@@ -22,6 +22,7 @@
                         <th>Year</th>
                         <th>Net Salary</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -34,9 +35,10 @@
                             <td>{{ $payslip->payrollRun?->year }}</td>
                             <td>{{ number_format($payslip->net_salary, 2) }}</td>
                             <td><span class="badge {{ ($payslip->payrollRun?->status ?? null) === 'paid' ? 'badge-success' : 'badge-muted' }}">{{ ucfirst($payslip->payrollRun?->status ?? '-') }}</span></td>
+                            <td><a href="{{ route('payslips.show', $payslip) }}" class="text-brand-600 font-medium">View</a></td>
                         </tr>
                     @empty
-                        <tr><td colspan="{{ $isEmployeeView ? 4 : 5 }}" class="text-slate-500">No payslips found.</td></tr>
+                        <tr><td colspan="{{ $isEmployeeView ? 5 : 6 }}" class="text-slate-500">No payslips found.</td></tr>
                     @endforelse
                     </tbody>
                 </table>

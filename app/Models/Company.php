@@ -42,6 +42,16 @@ class Company extends Model
         return $this->hasMany(SalaryStructure::class);
     }
 
+    public function leaveTypes()
+    {
+        return $this->hasMany(LeaveType::class);
+    }
+
+    public function leaveRequests()
+    {
+        return $this->hasMany(LeaveRequest::class);
+    }
+
     public function payrolls()
     {
         return $this->hasMany(Payroll::class);
