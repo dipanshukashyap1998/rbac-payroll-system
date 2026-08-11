@@ -13,7 +13,7 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
-                $permissions = [
+        $permissions = [
             'dashboard.view',
 
             'company.view',
