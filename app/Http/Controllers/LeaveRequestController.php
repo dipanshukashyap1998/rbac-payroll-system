@@ -14,9 +14,7 @@ use Illuminate\View\View;
 
 class LeaveRequestController extends Controller
 {
-    public function __construct(private LeavePolicyService $leavePolicyService)
-    {
-    }
+    public function __construct(private LeavePolicyService $leavePolicyService) {}
 
     public function index(Request $request): View
     {

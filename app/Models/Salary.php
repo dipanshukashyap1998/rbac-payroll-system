@@ -2,6 +2,4 @@
 
 namespace App\Models;
 
-class Salary extends SalaryStructure
-{
-}
+class Salary extends SalaryStructure {}

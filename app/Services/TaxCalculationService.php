@@ -3,10 +3,9 @@
 namespace App\Services;
 
 use App\Models\Employee;
-use App\Models\SalaryStructure;
+use App\Models\ProfessionalTax;
 use App\Models\SalaryComponent;
 use App\Models\TaxSlab;
-use App\Models\ProfessionalTax;
 
 class TaxCalculationService
 {
@@ -36,7 +35,7 @@ class TaxCalculationService
 
         $salaryStructure = $salaryAssignment?->salaryStructure;
 
-        if (!$salaryStructure) {
+        if (! $salaryStructure) {
             return [
                 'base' => $baseSalary,
                 'hra' => 0,

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
-use App\Services\LeavePolicyService;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\LeavePolicyService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,9 +17,7 @@ class UserController extends Controller
 {
     private const ALLOWED_ROLES = ['super_admin', 'admin', 'employee'];
 
-    public function __construct(private LeavePolicyService $leavePolicyService)
-    {
-    }
+    public function __construct(private LeavePolicyService $leavePolicyService) {}
 
     public function index(): View
     {
@@ -172,6 +170,7 @@ class UserController extends Controller
     {
         if ($roleName !== 'employee') {
             $user->employeeProfile()->delete();
+
             return;
         }
 

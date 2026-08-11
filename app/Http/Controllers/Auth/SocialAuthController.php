@@ -23,7 +23,7 @@ class SocialAuthController extends Controller
 
         if (! $this->providerIsConfigured($provider)) {
             return back()->withErrors([
-                'social' => ucfirst($provider) . ' login is not configured yet. Add its credentials in your environment file first.',
+                'social' => ucfirst($provider).' login is not configured yet. Add its credentials in your environment file first.',
             ]);
         }
 
@@ -36,7 +36,7 @@ class SocialAuthController extends Controller
 
         if (! $this->providerIsConfigured($provider)) {
             return redirect()->route('login')->withErrors([
-                'social' => ucfirst($provider) . ' login is not configured yet.',
+                'social' => ucfirst($provider).' login is not configured yet.',
             ]);
         }
 
@@ -53,7 +53,7 @@ class SocialAuthController extends Controller
             ]);
 
             return redirect()->route('login')->withErrors([
-                'social' => 'Unable to sign in with ' . ucfirst($provider) . ' right now. Please try again.',
+                'social' => 'Unable to sign in with '.ucfirst($provider).' right now. Please try again.',
             ]);
         }
 
@@ -62,13 +62,13 @@ class SocialAuthController extends Controller
 
         if ($providerId === '') {
             return redirect()->route('login')->withErrors([
-                'social' => ucfirst($provider) . ' did not return a valid account identifier.',
+                'social' => ucfirst($provider).' did not return a valid account identifier.',
             ]);
         }
 
         if (! $email) {
             return redirect()->route('login')->withErrors([
-                'social' => ucfirst($provider) . ' did not return an email address. Enable email access for the app and try again.',
+                'social' => ucfirst($provider).' did not return an email address. Enable email access for the app and try again.',
             ]);
         }
 
@@ -102,7 +102,7 @@ class SocialAuthController extends Controller
 
         if (! $user) {
             return redirect()->route('login')->withErrors([
-                'social' => 'No payroll account matches ' . $email . '. Ask an administrator to create your user first.',
+                'social' => 'No payroll account matches '.$email.'. Ask an administrator to create your user first.',
             ]);
         }
 
@@ -116,12 +116,12 @@ class SocialAuthController extends Controller
         request()->session()->regenerate();
 
         return redirect()->intended(route('dashboard'))
-            ->with('status', ucfirst($provider) . ' account connected successfully.');
+            ->with('status', ucfirst($provider).' account connected successfully.');
     }
 
     private function providerIsConfigured(string $provider): bool
     {
-        $config = config('services.' . $provider, []);
+        $config = config('services.'.$provider, []);
 
         return filled($config['client_id'] ?? null)
             && filled($config['client_secret'] ?? null)

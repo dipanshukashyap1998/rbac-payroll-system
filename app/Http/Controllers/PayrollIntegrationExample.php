@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Payroll;
 use App\Models\Employee;
+use App\Models\Payroll;
 use App\Services\LeavePolicyService;
 use App\Services\TaxCalculationService;
-use Illuminate\Http\Request;
 
 class PayrollController extends Controller
 {
@@ -28,7 +27,7 @@ class PayrollController extends Controller
             ->latest('effective_from')
             ->first();
 
-        if (!$employeeSalary) {
+        if (! $employeeSalary) {
             return redirect()->back()->with('error', 'Employee salary structure not configured');
         }
 

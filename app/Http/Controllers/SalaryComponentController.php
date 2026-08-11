@@ -46,7 +46,7 @@ class SalaryComponentController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        if (!$validated['percentage'] && !$validated['fixed_amount']) {
+        if (! $validated['percentage'] && ! $validated['fixed_amount']) {
             return back()->withErrors(['percentage' => 'Either percentage or fixed amount is required']);
         }
 
@@ -93,7 +93,7 @@ class SalaryComponentController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        if (!$validated['percentage'] && !$validated['fixed_amount']) {
+        if (! $validated['percentage'] && ! $validated['fixed_amount']) {
             return back()->withErrors(['percentage' => 'Either percentage or fixed amount is required']);
         }
 

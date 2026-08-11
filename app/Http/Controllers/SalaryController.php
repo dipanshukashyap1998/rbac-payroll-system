@@ -18,9 +18,7 @@ class SalaryController extends Controller
     public function __construct(
         private TaxCalculationService $taxService,
         private LeavePolicyService $leavePolicyService
-    )
-    {
-    }
+    ) {}
 
     public function index(Request $request): View
     {
