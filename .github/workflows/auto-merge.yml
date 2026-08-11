@@ -1,9 +1,13 @@
 name: Auto Merge Develop to Main
 
 on:
-  push:
+  workflow_run:
+    workflows:
+      - CI
     branches:
       - develop
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
@@ -17,6 +21,10 @@ concurrency:
 jobs:
   merge-and-push:
     name: Merge develop into main
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'develop')
     runs-on: ubuntu-latest
 
     steps:
