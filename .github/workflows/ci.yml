@@ -26,19 +26,41 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.2"
-          extensions: mbstring, pdo_sqlite
+          extensions: mbstring, pdo_sqlite, ctype, xml, bcmath
           coverage: none
+
+      # --- 1. OPTIMIZED COMPOSER CACHE ---
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
         with:
-          path: vendor
-          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             composer-${{ runner.os }}-
 
       - name: Install PHP dependencies
         run: composer install --no-interaction --no-progress --prefer-dist
+
+      # --- 2. CODE QUALITY CHECKS (OPTIONAL BUT RECOMMENDED) ---
+      - name: Check Code Style (Laravel Pint)
+        run: vendor/bin/pint --test
+        continue-on-error: false # Fails build if code style is dirty
+
+      # --- 3. FRONTEND BUILD (Uncomment if using Vite/Tailwind) ---
+      # - name: Setup Node.js
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: 20
+      #     cache: 'npm'
+      #
+      # - name: Build Assets
+      #   run: |
+      #     npm ci
+      #     npm run build
 
       - name: Prepare application environment
         run: |
