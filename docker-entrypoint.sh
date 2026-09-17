@@ -1,17 +1,12 @@
 #!/bin/sh
+set -e
 
-# Start PHP-FPM in background
-php-fpm -D
+echo "Waiting for database connection..."
+until mysql -h "$DB_HOST" -u "$DB_USERNAME" -p"$DB_PASSWORD" --skip-ssl -e "SELECT 1;" > /dev/null 2>&1; do
+  sleep 2
+done
 
-# Copy Nginx config and start Nginx
-cp nginx.conf /etc/nginx/sites-available/default
-service nginx start
+echo "Database connected!"
 
-# Run Laravel setup commands
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-php artisan migrate --force
-
-# Keep container alive
-tail -f /dev/null
+# Execute main process (PHP-FPM / Nginx)
+exec "$@"
