@@ -4,9 +4,11 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\HelpCenterController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\PayrollController;
@@ -18,6 +20,10 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/login');
+
+Route::post('/chatbot/guest', [ChatbotController::class, 'guest'])
+    ->middleware('throttle:10,1')
+    ->name('chatbot.guest');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
@@ -35,6 +41,13 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware(['auth', 'admin.company'])->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+
+    Route::post('/chatbot', [ChatbotController::class, 'authenticated'])
+        ->middleware('throttle:20,1')
+        ->name('chatbot.authenticated');
+
+    Route::get('/help', [HelpCenterController::class, 'index'])
+        ->name('help.index');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware('permission:dashboard.view')

@@ -6,6 +6,10 @@
 
 A secure, multi-tenant corporate payroll management platform featuring Role-Based Access Control (RBAC). The application automates core salary calculations, manages dynamic Indian statutory compliance structures (PF, ESI, TDS, PT), and handles complex leave workflows such as Casual, Sick, and Earned Leaves with built-in Loss of Pay (LOP) automated proration.
 
+The application includes an optional support chatbot for guests and authenticated users. It answers general product, navigation, permissions, and troubleshooting questions through Groq without reading or changing payroll records.
+
+Authenticated users can also open the in-app **Help Center** from the sidebar. Its canonical workflow guide is stored at `resources/docs/product-guide.md` and is used both for the Help Center page and as bounded knowledge for the support chatbot. Update that guide whenever a route, form, permission, or product workflow changes.
+
 ---
 
 ## 🚀 Key Features
@@ -50,3 +54,24 @@ Ensure your local environment meets the standard requirements for Laravel 10/11:
    ```bash
    git clone [https://github.com/dipanshukashyap1998/rbac-payroll-system.git](https://github.com/dipanshukashyap1998/rbac-payroll-system.git)
    cd rbac-payroll-system
+
+### Support Chatbot Configuration
+
+Set these values in `.env` to enable the Groq support assistant:
+
+```env
+GROQ_API_KEY=your-server-side-key
+GROQ_URL=https://api.groq.com/openai/v1/chat/completions
+GROQ_MODEL=llama-3.3-70b-versatile
+GROQ_TIMEOUT=20
+```
+
+Groq provides an OpenAI-compatible API, so the application uses the standard `/chat/completions` endpoint. Use the exact model name available in your Groq account if `llama-3.3-70b-versatile` is not enabled. The API key is used only by Laravel and is never sent to the browser. Chat messages are not persisted. The assistant receives only the submitted question and the recent browser conversation, and it is instructed not to access payroll, salary, tax, leave, payslip, employee, company, or account records. It cannot modify application data. Provider failures return a generic retry message.
+
+The guide intentionally documents current limitations. Attendance entry, payable-day calculation, payroll creation, payroll processing, payment, and payslip generation are not currently available through the application UI. Do not add instructions for those workflows until the corresponding product features are implemented and tested.
+
+Run the focused chatbot tests with:
+
+```bash
+php artisan test tests/Feature/ChatbotEndpointsTest.php
+```

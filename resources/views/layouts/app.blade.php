@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'RBAC System' }}</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -570,6 +571,10 @@
                     <span class="material-symbols-rounded">person</span> Users
                 </a>
             @endif
+
+            <a class="{{ request()->routeIs('help.*') ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-300 hover:bg-white/10 hover:text-white' }} flex items-center gap-2 rounded-2xl px-3 py-2.5" href="{{ route('help.index') }}">
+                <span class="material-symbols-rounded">help</span> Help Center
+            </a>
         </nav>
     </aside>
 
@@ -607,6 +612,8 @@
 </div>
 
 <div id="sidebarBackdrop" class="fixed inset-0 z-30 hidden bg-slate-900/40 lg:hidden" onclick="toggleSidebar()"></div>
+
+@include('components.chatbot', ['endpoint' => route('chatbot.authenticated')])
 
 <script>
     function toggleSidebar() {
