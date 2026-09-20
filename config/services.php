@@ -41,12 +41,12 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
-'groq' => [
-    'key' => env('GROQ_API_KEY', env('OPENAI_API_KEY')),
-    'url' => env('GROQ_BASE_URL', 'https://api.groq.com/openai/v1/chat/completions'),
-    'model' => env('GROQ_DEFAULT_MODEL', 'openai/gpt-oss-120b'),
-    'system_prompt' => env('CHATBOT_SYSTEM_PROMPT', 'You are a helpful customer support AI.'),
-    'timeout' => 20,
-],
+    'groq' => [
+        'key' => env('GROQ_API_KEY', env('OPENAI_API_KEY')),
+        'url' => env('GROQ_BASE_URL', 'https://api.groq.com/openai/v1/chat/completions'),
+        'model' => env('GROQ_DEFAULT_MODEL', 'openai/gpt-oss-120b'),
+        'system_prompt' => env('CHATBOT_SYSTEM_PROMPT', 'You are a helpful customer support AI.'),
+        'timeout' => 20,
+    ],
 
 ];

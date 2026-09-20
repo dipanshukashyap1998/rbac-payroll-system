@@ -9,12 +9,10 @@ use RuntimeException;
 
 class ChatbotService
 {
-    public function __construct(private readonly HttpFactory $http)
-    {
-    }
+    public function __construct(private readonly HttpFactory $http) {}
 
     /**
-     * @param array<int, array{role: string, content: string}> $history
+     * @param  array<int, array{role: string, content: string}>  $history
      */
     public function reply(string $message, array $history = []): string
     {

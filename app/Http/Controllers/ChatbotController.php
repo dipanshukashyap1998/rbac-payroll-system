@@ -9,9 +9,7 @@ use Throwable;
 
 class ChatbotController extends Controller
 {
-    public function __construct(private readonly ChatbotService $chatbot)
-    {
-    }
+    public function __construct(private readonly ChatbotService $chatbot) {}
 
     public function guest(Request $request): JsonResponse
     {
