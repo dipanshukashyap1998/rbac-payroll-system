@@ -28,8 +28,8 @@
                 @forelse($permissions as $permission)
                     <tr>
                         <td>
-                            <div class="font-medium text-slate-900">{{ $permission->name }}</div>
-                            <div class="text-sm text-slate-500">{{ str($permission->name)->before('.')->replace('_', ' ')->title() }}</div>
+                            <div class="font-medium text-slate-100">{{ str($permission->name)->replace(['.', '_'], ' ')->title() }}</div>
+                            <div class="text-sm text-slate-400">{{ str($permission->name)->before('.')->replace('_', ' ')->title() }}</div>
                         </td>
                         <td>{{ $permission->roles_count }}</td>
                         <td>
@@ -44,7 +44,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="3" class="text-slate-500">No permissions found.</td></tr>
+                    <tr><td colspan="3" class="text-slate-400">No permissions found.</td></tr>
                 @endforelse
                 </tbody>
                 </table>
