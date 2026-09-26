@@ -7,7 +7,7 @@
     <section class="chatbot-panel" id="chatbot-panel" data-chatbot-panel hidden aria-label="Support assistant">
         <header class="chatbot-header">
             <div>
-                <p class="chatbot-kicker">RBAC Payroll</p>
+                <p class="chatbot-kicker">{{ config('app.name') }}</p>
                 <h2>How can we help?</h2>
             </div>
             <button class="chatbot-close" type="button" data-chatbot-close aria-label="Close support assistant">

@@ -5,7 +5,7 @@
         <section class="page-hero">
             <div>
                 <span class="eyebrow"><span class="material-symbols-rounded">menu_book</span> Product guide</span>
-                <h2>Find your way around RBAC Payroll</h2>
+                <h2>Find your way around {{ config('app.name') }}</h2>
                 <p>Follow verified setup and daily-use workflows, or search this guide for a specific task.</p>
             </div>
             <div class="hero-actions">

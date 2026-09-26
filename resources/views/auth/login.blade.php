@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Sign In</title>
+    <title>Sign In | {{ config('app.name') }}</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -42,7 +42,7 @@
                 <div class="hidden lg:flex lg:flex-col lg:justify-center">
                     <span class="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm">
                         <span class="material-symbols-rounded">shield_lock</span>
-                        Secure RBAC Platform
+                        {{ config('app.name') }}
                     </span>
                     <h1 class="text-4xl font-semibold leading-tight text-white">Sign in to manage payroll, roles and permissions.</h1>
                     <p class="mt-4 max-w-md text-slate-300">Modern access control for Superadmin, Admins, and Employees in a single dashboard.</p>
