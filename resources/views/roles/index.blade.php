@@ -28,8 +28,7 @@
                 @forelse($roles as $role)
                     <tr>
                         <td>
-                            <div class="font-medium text-slate-900">{{ str($role->name)->replace('_', ' ')->title() }}</div>
-                            <div class="text-sm text-slate-500">{{ $role->name }}</div>
+                            <div class="font-medium text-slate-100">{{ str($role->name)->replace('_', ' ')->title() }}</div>
                         </td>
                         <td>{{ $role->permissions_count }}</td>
                         <td>{{ $role->user_roles_count }}</td>
@@ -40,7 +39,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="4" class="text-slate-500">No roles found.</td></tr>
+                    <tr><td colspan="4" class="text-slate-400">No roles found.</td></tr>
                 @endforelse
                 </tbody>
                 </table>

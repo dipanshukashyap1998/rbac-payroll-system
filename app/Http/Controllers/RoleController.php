@@ -69,9 +69,14 @@ class RoleController extends Controller
     {
         abort_unless(in_array($role->name, self::ALLOWED_ROLES, true), 404);
 
-        $permissions = Permission::query()->orderBy('name')->get();
+        $permissionGroups = Permission::query()
+            ->orderBy('name')
+            ->get()
+            ->groupBy(fn (Permission $permission) => str($permission->name)->contains('.')
+                ? str($permission->name)->before('.')->replace('_', ' ')->title()->toString()
+                : 'General');
 
-        return view('roles.edit', compact('role', 'permissions'));
+        return view('roles.edit', compact('role', 'permissionGroups'));
     }
 
     public function update(Request $request, Role $role): RedirectResponse

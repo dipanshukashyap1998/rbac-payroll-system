@@ -273,7 +273,7 @@
             margin-bottom: 1rem;
         }
 
-        .field label {
+        .field > label {
             display: block;
             margin-bottom: .45rem;
             color: #cbd5e1;
@@ -289,9 +289,9 @@
             line-height: 1.5;
         }
 
-        .field input,
-        .field select,
-        .field textarea {
+        .field > input,
+        .field > select,
+        .field > textarea {
             width: 100%;
             border: 1px solid rgba(148, 163, 184, .18);
             border-radius: 1rem;
@@ -303,9 +303,9 @@
             transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
         }
 
-        .field input:focus,
-        .field select:focus,
-        .field textarea:focus {
+        .field > input:focus,
+        .field > select:focus,
+        .field > textarea:focus {
             border-color: #38bdf8;
             background: rgba(15, 23, 42, .95);
             box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.16);

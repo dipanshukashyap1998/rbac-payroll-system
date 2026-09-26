@@ -45,7 +45,7 @@ return [
         'key' => env('GROQ_API_KEY', env('OPENAI_API_KEY')),
         'url' => env('GROQ_BASE_URL', 'https://api.groq.com/openai/v1/chat/completions'),
         'model' => env('GROQ_DEFAULT_MODEL', 'openai/gpt-oss-120b'),
-        'system_prompt' => env('CHATBOT_SYSTEM_PROMPT', 'You are a helpful customer support AI.'),
+        'system_prompt' => env('CHATBOT_SYSTEM_PROMPT', 'You are a precise, friendly customer support AI for RBAC Payroll. Help users complete supported product workflows without accessing private records.'),
         'timeout' => 20,
     ],
 

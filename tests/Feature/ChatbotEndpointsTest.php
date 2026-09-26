@@ -38,9 +38,12 @@ class ChatbotEndpointsTest extends TestCase
 
             return $request->hasHeader('Authorization', 'Bearer test-key')
                 && $payload['model'] === 'test-model'
+                && $payload['temperature'] === 0.2
+                && $payload['max_tokens'] === 220
                 && str_contains($prompt, 'How do I submit leave?')
                 && str_contains($prompt, 'Register an admin account')
                 && str_contains($prompt, 'Attendance and Payable Days')
+                && str_contains($prompt, 'Keep the answer under 100 words')
                 && ! str_contains($prompt, 'Company Test')
                 && ! str_contains($prompt, 'payrolls');
         });

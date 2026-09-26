@@ -22,23 +22,31 @@
                 <div class="field">
                     <label>Assign Permissions</label>
                     @php($selectedPermissions = old('permission_ids', $role->permissions()->pluck('permissions.id')->all()))
-                    <div class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                        <p class="mb-3 text-xs uppercase tracking-[0.18em] text-slate-500">Permission checklist</p>
+                    <div class="space-y-5">
+                        @foreach($permissionGroups as $groupName => $groupPermissions)
+                            <section class="border-b border-slate-700/50 pb-5 last:border-0 last:pb-0" aria-labelledby="permission-group-{{ $loop->index }}">
+                                <div class="mb-3 flex items-center justify-between gap-3">
+                                    <h3 id="permission-group-{{ $loop->index }}" class="text-base font-semibold text-slate-100">{{ $groupName }}</h3>
+                                    <span class="text-sm text-slate-400">{{ $groupPermissions->count() }} {{ str('permission')->plural($groupPermissions->count()) }}</span>
+                                </div>
 
-                        <div class="grid gap-2 sm:grid-cols-2">
-                            @foreach($permissions as $permission)
-                                <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:border-teal-300 hover:bg-teal-50/40">
-                                    <input
-                                        type="checkbox"
-                                        name="permission_ids[]"
-                                        value="{{ $permission->id }}"
-                                        @checked(in_array($permission->id, $selectedPermissions))
-                                        class="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
-                                    >
-                                    <span>{{ $permission->name }}</span>
-                                </label>
+                                <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                                    @foreach($groupPermissions as $permission)
+                                        @php($permissionLabel = str($permission->name)->contains('.') ? str($permission->name)->after('.')->replace(['.', '_'], ' ')->title() : str($permission->name)->replace(['.', '_'], ' ')->title())
+                                        <label class="flex min-w-0 items-center gap-3 rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2.5 text-sm text-slate-200 transition hover:border-teal-500/70 hover:bg-slate-800/70">
+                                            <input
+                                                type="checkbox"
+                                                name="permission_ids[]"
+                                                value="{{ $permission->id }}"
+                                                @checked(in_array($permission->id, $selectedPermissions))
+                                                class="h-4 w-4 shrink-0 rounded border-slate-500 text-teal-500 focus:ring-teal-400"
+                                            >
+                                            <span class="break-words">{{ $permissionLabel }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </section>
                             @endforeach
-                        </div>
                     </div>
                 </div>
 

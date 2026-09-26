@@ -37,7 +37,7 @@ class ChatbotService
         if (! empty(trim((string) $systemPrompt))) {
             $messages[] = [
                 'role' => 'system',
-                'content' => trim((string) $systemPrompt)."\n\nUse only this verified product guide for application workflow questions. If the guide says a feature is unavailable, say so clearly. Do not claim to have performed actions or accessed private records.\n\n--- PRODUCT GUIDE ---\n".$guide,
+                'content' => trim((string) $systemPrompt)."\n\nResponse rules:\n- Answer the exact question first in plain, friendly language.\n- Keep the answer under 100 words unless the user asks for more detail.\n- Use at most 4 short numbered steps or bullets for procedures.\n- Do not repeat the question, add greetings, or include unnecessary background.\n- If the guide does not support the requested action, say that clearly and suggest the closest available next step.\n- Never invent fields, permissions, calculations, or workflows.\n\nUse only this verified product guide for application workflow questions. Do not claim to have performed actions or accessed private records.\n\n--- PRODUCT GUIDE ---\n".$guide,
             ];
         }
 
@@ -66,7 +66,8 @@ class ChatbotService
                 ->timeout((int) config('services.groq.timeout', 20))
                 ->post($baseUrl, [
                     'model' => $model,
-                    'temperature' => 0.7,
+                    'temperature' => 0.2,
+                    'max_tokens' => 220,
                     'messages' => $messages,
                 ]);
 

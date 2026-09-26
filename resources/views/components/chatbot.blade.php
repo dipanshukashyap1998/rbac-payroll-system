@@ -21,6 +21,10 @@
             </div>
         </div>
 
+        <div class="chatbot-typing" data-chatbot-typing hidden aria-label="Support assistant is responding">
+            <span></span><span></span><span></span>
+        </div>
+
         <form class="chatbot-form" data-chatbot-form>
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <label class="sr-only" for="chatbot-message-{{ md5($endpoint) }}">Ask the support assistant</label>
@@ -47,6 +51,12 @@
     .chatbot-message { max-width: 88%; border-radius: .9rem; padding: .7rem .8rem; font-size: .82rem; line-height: 1.5; white-space: pre-wrap; }
     .chatbot-message-assistant { justify-self: start; background: rgba(255,255,255,.09); color: #dbeafe; }
     .chatbot-message-user { justify-self: end; background: #0ea5e9; color: #fff; }
+    .chatbot-typing { display: inline-flex; align-items: center; gap: .25rem; width: fit-content; margin: 0 1rem .35rem; border-radius: .75rem; background: rgba(255,255,255,.09); padding: .55rem .65rem; }
+    .chatbot-typing[hidden] { display: none !important; }
+    .chatbot-typing span { width: .35rem; height: .35rem; border-radius: 50%; background: #67e8f9; animation: chatbot-pulse 1s infinite ease-in-out; }
+    .chatbot-typing span:nth-child(2) { animation-delay: .15s; }
+    .chatbot-typing span:nth-child(3) { animation-delay: .3s; }
+    @keyframes chatbot-pulse { 0%, 60%, 100% { opacity: .3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-.2rem); } }
     .chatbot-form { display: flex; align-items: flex-end; gap: .5rem; border-top: 1px solid rgba(148,163,184,.16); padding: .8rem; }
     .chatbot-form textarea { min-width: 0; flex: 1; resize: none; border: 1px solid rgba(148,163,184,.24); border-radius: .75rem; background: rgba(2,6,23,.55); color: #f8fafc; padding: .65rem .7rem; font: inherit; font-size: .82rem; outline: none; }
     .chatbot-form textarea:focus { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,.15); }
@@ -69,6 +79,7 @@
         const input = root.querySelector('[data-chatbot-input]');
         const send = root.querySelector('.chatbot-send');
         const messages = root.querySelector('[data-chatbot-messages]');
+        const typing = root.querySelector('[data-chatbot-typing]');
         const status = root.querySelector('[data-chatbot-status]');
         const history = [];
 
@@ -104,7 +115,8 @@
             history.push({ role: 'user', content: message });
             input.value = '';
             send.disabled = true;
-            status.textContent = 'Thinking...';
+            typing.hidden = false;
+            status.textContent = '';
 
             try {
                 const response = await fetch(root.dataset.endpoint, {
@@ -125,6 +137,7 @@
             } catch (error) {
                 status.textContent = error.message || 'The assistant is unavailable. Please try again.';
             } finally {
+                typing.hidden = true;
                 send.disabled = false;
                 input.focus();
             }
