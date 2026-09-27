@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'RBAC System' }}</title>
+    <title>{{ isset($title) ? $title.' | '.config('app.name') : config('app.name') }}</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -486,7 +486,7 @@
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 -translate-x-full border-r border-white/40 bg-slate-950/92 px-4 py-6 text-slate-100 shadow-float backdrop-blur transition-transform lg:static lg:translate-x-0 lg:shadow-none">
         <div class="mb-6 flex items-center justify-between lg:justify-start">
             <div>
-                <p class="text-xs uppercase tracking-[0.22em] text-teal-200/80">RBAC Payroll</p>
+                <p class="text-xs uppercase tracking-[0.22em] text-teal-200/80">{{ config('app.name') }}</p>
                 <p class="text-lg font-semibold text-white">Control Center</p>
             </div>
             <button type="button" class="rounded-lg p-2 text-slate-300 hover:bg-white/10 lg:hidden" onclick="toggleSidebar()">

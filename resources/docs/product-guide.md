@@ -1,6 +1,6 @@
-# RBAC Payroll Product Guide
+# VectisPay Product Guide
 
-Welcome to RBAC Payroll. This guide explains the supported workflows for setting up a company, onboarding employees, managing leave, and viewing available payroll information.
+Welcome to VectisPay. This guide explains the supported workflows for setting up a company, onboarding employees, managing leave, and viewing available payroll information.
 
 > This guide describes the current application. Attendance entry, payable-day calculation, payroll creation, payroll processing, payment, and payslip generation are not currently available as user workflows.
 
