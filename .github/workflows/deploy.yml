@@ -9,7 +9,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production
 
     steps:
       - name: Checkout Code
@@ -30,9 +29,14 @@ jobs:
 
       - name: Build Frontend Assets
         run: |
-          npm ci
+          npm install
           npm run build
 
-      - name: Trigger Webhook Deployment
+      - name: Install Wasmer CLI
+        uses: wasmerio/setup-wasmer@v3.1
+
+      - name: Deploy to Wasmer
+        env:
+          WASMER_TOKEN: ${{ secrets.WASMER_TOKEN }}
         run: |
-          curl -sS -X POST "${{ secrets.DEPLOY_TOKEN }}"
+          wasmer deploy --token="${WASMER_TOKEN}"
