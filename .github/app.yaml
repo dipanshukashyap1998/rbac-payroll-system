@@ -1,0 +1,4 @@
+kind: WasmerApp
+name: VectisPay       # Replace with your app name from Wasmer dashboard
+owner: dipanshukashyap # Replace with your Wasmer account username
+package: php/php:8.3      # Uses the official PHP package for Wasmer
