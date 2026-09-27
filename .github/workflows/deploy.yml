@@ -9,6 +9,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: Checkout Code
@@ -32,9 +33,6 @@ jobs:
           npm ci
           npm run build
 
-      - name: Deploy Step
-        env:
-          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+      - name: Trigger Webhook Deployment
         run: |
-          echo "Deploying application release..."
-          # Replace with your target host's deployment command (e.g., rsync, netlify deploy, flyctl deploy, etc.)
+          curl -sS -X POST "${{ secrets.DEPLOY_TOKEN }}"
