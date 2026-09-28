@@ -1,4 +1,9 @@
 kind: wasmer.io/App.v0
-owner: dipanshukashyap
+owner: dipanshu
 name: vectis-pay
 package: php/php:8.3
+
+cli:
+  # Force migrations to run non-interactively
+  after_deploy:
+    - php artisan migrate --force --no-interaction
