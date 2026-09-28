@@ -38,7 +38,7 @@ jobs:
 
       - name: Build Frontend Assets
         run: |
-          npm ci
+          npm install
           npm run build
 
       - name: Setup Wasmer CLI
