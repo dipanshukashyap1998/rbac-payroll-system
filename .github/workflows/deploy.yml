@@ -18,6 +18,14 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Composer Dependencies
         run: composer install --no-dev --optimize-autoloader --no-interaction
@@ -26,14 +34,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Build Frontend Assets
         run: |
-          npm install
+          npm ci
           npm run build
 
       - name: Setup Wasmer CLI
         uses: wasmerio/setup-wasmer@v3.1
 
       - name: Deploy to Wasmer Edge
-        run: wasmer deploy --token="${{ secrets.WASMER_TOKEN }}"
+        env:
+          WASMER_TOKEN: ${{ secrets.WASMER_TOKEN }}
+        run: wasmer deploy
