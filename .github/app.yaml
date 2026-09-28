@@ -1,3 +1,4 @@
-kind: WasmerApp
-name: VectisPay
+kind: wasmer.io/App.v0
+owner: dipanshukashyap
+name: vectis-pay
 package: php/php:8.3
