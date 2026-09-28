@@ -1,11 +1,9 @@
-name: Auto Merge Develop to Main
+name: Auto Merge to Main
 
 on:
   workflow_run:
     workflows:
       - CI
-    branches:
-      - develop
     types:
       - completed
   workflow_dispatch:
@@ -15,39 +13,41 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: auto-merge-develop-to-main
+  group: auto-merge-to-main
   cancel-in-progress: true
 
 jobs:
   merge-and-push:
-    name: Merge develop into main
+    name: Merge branch into main
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.head_branch == 'develop')
+       github.event.workflow_run.head_branch != 'main')
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
+      - name: Checkout target branch
+        uses: actions/checkout@v4
         with:
-          ref: develop
+          ref: ${{ github.event.workflow_run.head_branch || github.ref_name }}
           fetch-depth: 0
 
-      - name: Merge develop into main and push
+      - name: Merge branch into main and push
         run: |
           set -euo pipefail
+
+          BRANCH="${{ github.event.workflow_run.head_branch || github.ref_name }}"
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git fetch origin main develop
+          git fetch origin main "$BRANCH"
 
-          if git diff --quiet origin/main..origin/develop; then
-            echo "No changes to promote from develop to main."
+          if git diff --quiet origin/main.."origin/$BRANCH"; then
+            echo "No changes to promote from $BRANCH to main."
             exit 0
           fi
 
           git checkout -B main origin/main
-          git merge --no-ff --no-edit origin/develop
+          git merge --no-ff --no-edit "origin/$BRANCH"
           git push origin HEAD:main
